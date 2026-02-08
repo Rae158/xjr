@@ -1,0 +1,1310 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>个人作品集</title>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-green: #66bb6a;
+            --light-green: #81c784;
+            --pale-green: #f8fff8;
+            --dark-green: #43a047;
+            --white: #ffffff;
+            --light-gray: #f5f5f5;
+            --gray: #666666;
+            --dark-gray: #333333;
+            --shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            --shadow-hover: 0 4px 16px rgba(0, 0, 0, 0.12);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, var(--pale-green) 0%, #e8f5e8 100%);
+            min-height: 100vh;
+            color: var(--dark-gray);
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 0;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            font-size: 2em;
+            font-weight: 300;
+            color: var(--dark-green);
+        }
+
+        .edit-mode-btn {
+            background: linear-gradient(135deg, var(--primary-green) 0%, var(--dark-green) 100%);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 0.9em;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .edit-mode-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 187, 106, 0.4);
+        }
+
+        .edit-mode-btn.active {
+            background: linear-gradient(135deg, #ef5350 0%, #e53935 100%);
+        }
+
+        .section {
+            background: var(--white);
+            border-radius: 16px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: var(--shadow);
+            transition: all 0.3s;
+        }
+
+        .section:hover {
+            box-shadow: var(--shadow-hover);
+        }
+
+        .section-title {
+            font-size: 1.8em;
+            color: var(--dark-green);
+            margin-bottom: 25px;
+            font-weight: 300;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .section-title::before {
+            content: '';
+            width: 4px;
+            height: 30px;
+            background: var(--primary-green);
+            border-radius: 2px;
+        }
+
+        .profile-section {
+            display: flex;
+            gap: 40px;
+            align-items: flex-start;
+        }
+
+        .profile-image-container {
+            flex: 0 0 300px;
+            position: relative;
+        }
+
+        .profile-image {
+            width: 300px;
+            height: 300px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 4px solid var(--white);
+            box-shadow: var(--shadow-hover);
+            background: var(--light-gray);
+        }
+
+        .profile-info {
+            flex: 1;
+        }
+
+        .profile-name {
+            font-size: 2.5em;
+            color: var(--dark-green);
+            margin-bottom: 10px;
+            font-weight: 300;
+        }
+
+        .profile-title {
+            color: var(--primary-green);
+            font-size: 1.2em;
+            margin-bottom: 20px;
+            font-weight: 500;
+        }
+
+        .profile-content {
+            color: var(--gray);
+            font-size: 1.1em;
+            line-height: 1.8;
+            margin-bottom: 20px;
+        }
+
+        .skills-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .skill-tag {
+            background: var(--pale-green);
+            color: var(--dark-green);
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.9em;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .experience-item {
+            border-left: 3px solid var(--primary-green);
+            padding-left: 25px;
+            margin-bottom: 30px;
+            position: relative;
+        }
+
+        .experience-item::before {
+            content: '';
+            position: absolute;
+            left: -8px;
+            top: 0;
+            width: 13px;
+            height: 13px;
+            background: var(--primary-green);
+            border-radius: 50%;
+        }
+
+        .experience-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 10px;
+        }
+
+        .experience-company {
+            font-size: 1.3em;
+            color: var(--dark-green);
+            font-weight: 500;
+        }
+
+        .experience-time {
+            color: var(--gray);
+            font-size: 0.9em;
+        }
+
+        .experience-position {
+            color: var(--primary-green);
+            font-size: 1.1em;
+            margin-bottom: 10px;
+        }
+
+        .experience-content {
+            color: var(--gray);
+            line-height: 1.8;
+        }
+
+        .portfolio-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 25px;
+        }
+
+        .portfolio-item {
+            background: var(--white);
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: var(--shadow);
+            transition: all 0.3s;
+            position: relative;
+        }
+
+        .portfolio-item:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-hover);
+        }
+
+        .portfolio-images {
+            position: relative;
+            height: 250px;
+            background: var(--light-gray);
+            cursor: pointer;
+        }
+
+        .portfolio-main-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .portfolio-thumbnails {
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            display: flex;
+            gap: 5px;
+        }
+
+        .thumbnail {
+            width: 40px;
+            height: 40px;
+            border-radius: 5px;
+            object-fit: cover;
+            border: 2px solid var(--white);
+        }
+
+        .portfolio-video {
+            position: relative;
+            height: 250px;
+            background: var(--light-gray);
+        }
+
+        .portfolio-video video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .portfolio-info {
+            padding: 20px;
+        }
+
+        .portfolio-category {
+            color: var(--primary-green);
+            font-size: 0.8em;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .portfolio-title {
+            font-size: 1.3em;
+            color: var(--dark-green);
+            margin-bottom: 10px;
+            font-weight: 500;
+        }
+
+        .portfolio-description {
+            color: var(--gray);
+            font-size: 0.95em;
+            line-height: 1.6;
+        }
+
+        .portfolio-actions {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            display: flex;
+            gap: 8px;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .portfolio-item:hover .portfolio-actions {
+            opacity: 1;
+        }
+
+        .action-btn {
+            background: rgba(255, 255, 255, 0.95);
+            border: none;
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 16px;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .action-btn:hover {
+            transform: scale(1.1);
+        }
+
+        .action-btn.edit {
+            color: var(--primary-green);
+        }
+
+        .action-btn.delete {
+            color: #ef5350;
+        }
+
+        .add-btn {
+            background: linear-gradient(135deg, var(--light-green) 0%, var(--primary-green) 100%);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 1em;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 20px;
+        }
+
+        .add-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 187, 106, 0.4);
+        }
+
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background: var(--white);
+            padding: 40px;
+            border-radius: 20px;
+            max-width: 600px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal-title {
+            font-size: 1.5em;
+            color: var(--dark-green);
+            margin-bottom: 30px;
+            font-weight: 500;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--gray);
+            font-weight: 500;
+        }
+
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid var(--light-gray);
+            border-radius: 10px;
+            font-size: 1em;
+            transition: border-color 0.3s;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: var(--primary-green);
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 1em;
+            transition: all 0.2s;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary-green) 0%, var(--dark-green) 100%);
+            color: white;
+        }
+
+        .btn-secondary {
+            background: var(--light-gray);
+            color: var(--dark-gray);
+        }
+
+        .file-input-wrapper {
+            position: relative;
+            overflow: hidden;
+            display: inline-block;
+        }
+
+        .file-input-wrapper input[type=file] {
+            position: absolute;
+            left: 0;
+            top: 0;
+            opacity: 0;
+            width: 100%;
+            height: 100%;
+            cursor: pointer;
+        }
+
+        .file-input-btn {
+            background: linear-gradient(135deg, var(--light-green) 0%, var(--primary-green) 100%);
+            color: white;
+            padding: 12px 20px;
+            border-radius: 10px;
+            cursor: pointer;
+            display: inline-block;
+            transition: all 0.2s;
+        }
+
+        .image-preview {
+            max-width: 100%;
+            max-height: 200px;
+            margin-top: 15px;
+            border-radius: 10px;
+            display: none;
+        }
+
+        .image-preview.active {
+            display: block;
+        }
+
+        .image-gallery {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .gallery-item {
+            width: 80px;
+            height: 80px;
+            border-radius: 8px;
+            object-fit: cover;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .gallery-item:hover {
+            transform: scale(1.05);
+        }
+
+        .gallery-item-remove {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background: #ef5350;
+            color: white;
+            border: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .image-viewer {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+        }
+
+        .image-viewer-content {
+            max-width: 90%;
+            max-height: 90%;
+            position: relative;
+        }
+
+        .image-viewer img {
+            max-width: 100%;
+            max-height: 90vh;
+            border-radius: 10px;
+        }
+
+        .image-viewer-close {
+            position: absolute;
+            top: -40px;
+            right: -40px;
+            background: white;
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--dark-gray);
+        }
+
+        .toast {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: var(--primary-green);
+            color: white;
+            padding: 15px 25px;
+            border-radius: 10px;
+            box-shadow: var(--shadow-hover);
+            z-index: 3000;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        .category-filter {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+        }
+
+        .category-btn {
+            background: var(--white);
+            border: 2px solid var(--light-gray);
+            padding: 8px 16px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.9em;
+            transition: all 0.3s;
+        }
+
+        .category-btn:hover,
+        .category-btn.active {
+            background: var(--primary-green);
+            border-color: var(--primary-green);
+            color: white;
+        }
+
+        .rich-text-editor {
+            border: 2px solid var(--light-gray);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .rich-text-toolbar {
+            background: var(--light-gray);
+            padding: 10px;
+            display: flex;
+            gap: 5px;
+            flex-wrap: wrap;
+        }
+
+        .toolbar-btn {
+            background: var(--white);
+            border: 1px solid #ddd;
+            padding: 5px 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.9em;
+            transition: all 0.2s;
+        }
+
+        .toolbar-btn:hover {
+            background: var(--primary-green);
+            color: white;
+            border-color: var(--primary-green);
+        }
+
+        .rich-text-content {
+            padding: 15px;
+            min-height: 150px;
+            outline: none;
+        }
+
+        .rich-text-content:focus {
+            background: var(--pale-green);
+        }
+
+        @media (max-width: 768px) {
+            .profile-section {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .profile-image-container {
+                flex: 0 0 auto;
+            }
+
+            .portfolio-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .header {
+                flex-direction: column;
+                gap: 15px;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <div class="container">
+            <header class="header">
+                <h1>个人作品集</h1>
+                <button class="edit-mode-btn" :class="{ active: editMode }" @click="toggleEditMode">
+                    <span v-if="!editMode">✎ 编辑模式</span>
+                    <span v-else>✓ 完成编辑</span>
+                </button>
+            </header>
+
+            <section class="section">
+                <h2 class="section-title">个人介绍</h2>
+                <div class="profile-section">
+                    <div class="profile-image-container">
+                        <img :src="profile.image || 'data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 width=%27300%27 height=%27300%27 viewBox=%270 0 300 300%27%3E%3Crect fill=%23f5f5f5%27 width=%27300%27 height=%27300%27/%3E%3Ccircle cx=%27150%27 cy=%27120%27 r=%2750%27 fill=%23ccc%27/%3E%3Cellipse cx=%27150%27 cy=%27220%27 rx=%2770%27 ry=%2750%27 fill=%23ccc%27/%3E%3C/svg%3E'" 
+                             class="profile-image" alt="个人头像">
+                    </div>
+                    <div class="profile-info">
+                        <h3 class="profile-name">{{ profile.name }}</h3>
+                        <p class="profile-title">{{ profile.title }}</p>
+                        <div class="profile-content" v-html="profile.bio"></div>
+                        <div class="skills-grid">
+                            <div class="skill-tag" v-for="skill in profile.skills" :key="skill">
+                                <span>⚡</span> {{ skill }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div v-if="editMode" style="margin-top: 20px; text-align: center;">
+                    <button class="add-btn" @click="openProfileModal">
+                        <span>✎</span> 编辑个人信息
+                    </button>
+                </div>
+            </section>
+
+            <section class="section">
+                <h2 class="section-title">实习经历</h2>
+                <div v-if="editMode" style="margin-bottom: 20px;">
+                    <button class="add-btn" @click="openExperienceModal">
+                        <span>+</span> 添加实习经历
+                    </button>
+                </div>
+                <div v-for="(exp, index) in experiences" :key="exp.id" class="experience-item">
+                    <div class="experience-header">
+                        <div>
+                            <h4 class="experience-company">{{ exp.company }}</h4>
+                            <p class="experience-position">{{ exp.position }}</p>
+                        </div>
+                        <span class="experience-time">{{ exp.time }}</span>
+                    </div>
+                    <div class="experience-content" v-html="exp.content"></div>
+                    <div v-if="exp.image" style="margin-top: 15px;">
+                        <img :src="exp.image" style="max-width: 100%; max-height: 200px; border-radius: 8px; cursor: pointer;" @click="openImageViewer([exp.image])">
+                    </div>
+                    <div v-if="editMode" style="margin-top: 15px; display: flex; gap: 10px;">
+                        <button class="action-btn edit" @click="editExperience(exp.id)">✎</button>
+                        <button class="action-btn delete" @click="deleteExperience(exp.id)">✕</button>
+                    </div>
+                </div>
+            </section>
+
+            <section class="section">
+                <h2 class="section-title">作品展示</h2>
+                <div class="category-filter">
+                    <button class="category-btn" :class="{ active: currentCategory === 'all' }" @click="currentCategory = 'all'">全部</button>
+                    <button class="category-btn" v-for="category in categories" :key="category" 
+                            :class="{ active: currentCategory === category }" @click="currentCategory = category">
+                        {{ category }}
+                    </button>
+                </div>
+                <div v-if="editMode" style="margin-bottom: 20px;">
+                    <button class="add-btn" @click="openPortfolioModal">
+                        <span>+</span> 添加新作品
+                    </button>
+                </div>
+                <div class="portfolio-grid">
+                    <div v-for="item in filteredPortfolios" :key="item.id" class="portfolio-item">
+                        <div v-if="item.images && item.images.length > 0" class="portfolio-images" @click="openImageViewer(item.images)">
+                            <img :src="item.images[0]" class="portfolio-main-image" :alt="item.title">
+                            <div class="portfolio-thumbnails" v-if="item.images.length > 1">
+                                <img v-for="(img, idx) in item.images.slice(0, 3)" :key="idx" :src="img" class="thumbnail">
+                                <div v-if="item.images.length > 3" class="thumbnail" style="background: rgba(255,255,255,0.8); display: flex; align-items: center; justify-content: center; color: #333; font-size: 12px;">+{{ item.images.length - 3 }}</div>
+                            </div>
+                        </div>
+                        <div v-else-if="item.video" class="portfolio-video">
+                            <video :src="item.video" controls></video>
+                        </div>
+                        <div v-else class="portfolio-images">
+                            <div style="display: flex; align-items: center; justify-content: center; height: 100%; color: #999;">暂无图片</div>
+                        </div>
+                        <div class="portfolio-actions" v-if="editMode">
+                            <button class="action-btn edit" @click="editPortfolio(item.id)">✎</button>
+                            <button class="action-btn delete" @click="deletePortfolio(item.id)">✕</button>
+                        </div>
+                        <div class="portfolio-info">
+                            <p class="portfolio-category">{{ item.category }}</p>
+                            <h4 class="portfolio-title">{{ item.title }}</h4>
+                            <p class="portfolio-description">{{ item.description }}</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <div class="modal" v-if="showProfileModal" @click.self="closeModals">
+            <div class="modal-content">
+                <h3 class="modal-title">编辑个人信息</h3>
+                <div class="form-group">
+                    <label>姓名</label>
+                    <input type="text" v-model="editingProfile.name">
+                </div>
+                <div class="form-group">
+                    <label>职位</label>
+                    <input type="text" v-model="editingProfile.title">
+                </div>
+                <div class="form-group">
+                    <label>个人简介</label>
+                    <div class="rich-text-editor">
+                        <div class="rich-text-toolbar">
+                            <button class="toolbar-btn" @click="execCommand('bold')"><b>B</b></button>
+                            <button class="toolbar-btn" @click="execCommand('italic')"><i>I</i></button>
+                            <button class="toolbar-btn" @click="execCommand('insertParagraph')">段落</button>
+                        </div>
+                        <div class="rich-text-content" contenteditable="true" v-html="editingProfile.bio" @input="editingProfile.bio = $event.target.innerHTML"></div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>技能（用逗号分隔）</label>
+                    <input type="text" v-model="editingProfile.skillsText">
+                </div>
+                <div class="form-group">
+                    <label>头像</label>
+                    <div class="file-input-wrapper">
+                        <button class="file-input-btn">选择图片</button>
+                        <input type="file" accept="image/*" @change="handleProfileImageUpload">
+                    </div>
+                    <img v-if="editingProfile.imagePreview" :src="editingProfile.imagePreview" class="image-preview active">
+                </div>
+                <div class="form-actions">
+                    <button class="btn btn-secondary" @click="closeModals">取消</button>
+                    <button class="btn btn-primary" @click="saveProfile">保存</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal" v-if="showExperienceModal" @click.self="closeModals">
+            <div class="modal-content">
+                <h3 class="modal-title">{{ editingExperience.id ? '编辑' : '添加' }}实习经历</h3>
+                <div class="form-group">
+                    <label>公司名称</label>
+                    <input type="text" v-model="editingExperience.company">
+                </div>
+                <div class="form-group">
+                    <label>职位</label>
+                    <input type="text" v-model="editingExperience.position">
+                </div>
+                <div class="form-group">
+                    <label>时间</label>
+                    <input type="text" v-model="editingExperience.time" placeholder="如：2023.01 - 2023.06">
+                </div>
+                <div class="form-group">
+                    <label>工作内容</label>
+                    <div class="rich-text-editor">
+                        <div class="rich-text-toolbar">
+                            <button class="toolbar-btn" @click="execCommand('bold')"><b>B</b></button>
+                            <button class="toolbar-btn" @click="execCommand('italic')"><i>I</i></button>
+                            <button class="toolbar-btn" @click="execCommand('insertParagraph')">段落</button>
+                        </div>
+                        <div class="rich-text-content" contenteditable="true" v-html="editingExperience.content" @input="editingExperience.content = $event.target.innerHTML"></div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>佐证图</label>
+                    <div class="file-input-wrapper">
+                        <button class="file-input-btn">选择图片</button>
+                        <input type="file" accept="image/*" @change="handleExperienceImageUpload">
+                    </div>
+                    <img v-if="editingExperience.imagePreview" :src="editingExperience.imagePreview" class="image-preview active">
+                </div>
+                <div class="form-actions">
+                    <button class="btn btn-secondary" @click="closeModals">取消</button>
+                    <button class="btn btn-primary" @click="saveExperience">保存</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal" v-if="showPortfolioModal" @click.self="closeModals">
+            <div class="modal-content">
+                <h3 class="modal-title">{{ editingPortfolio.id ? '编辑' : '添加' }}作品</h3>
+                <div class="form-group">
+                    <label>作品分类</label>
+                    <input type="text" v-model="editingPortfolio.category" placeholder="如：设计、开发、摄影等">
+                </div>
+                <div class="form-group">
+                    <label>作品标题</label>
+                    <input type="text" v-model="editingPortfolio.title">
+                </div>
+                <div class="form-group">
+                    <label>作品描述</label>
+                    <textarea v-model="editingPortfolio.description"></textarea>
+                </div>
+                <div class="form-group">
+                    <label>作品图片（可选择多张）</label>
+                    <div class="file-input-wrapper">
+                        <button class="file-input-btn">选择图片</button>
+                        <input type="file" accept="image/*" multiple @change="handlePortfolioImagesUpload">
+                    </div>
+                    <div class="image-gallery">
+                        <div v-for="(img, idx) in editingPortfolio.images" :key="idx" class="gallery-item">
+                            <img :src="img" style="width: 100%; height: 100%; object-fit: cover; border-radius: 8px;">
+                            <button class="gallery-item-remove" @click="removePortfolioImage(idx)">×</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>作品视频（MP4/MOV）</label>
+                    <div class="file-input-wrapper">
+                        <button class="file-input-btn">选择视频</button>
+                        <input type="file" accept="video/mp4,video/quicktime" @change="handlePortfolioVideoUpload">
+                    </div>
+                    <video v-if="editingPortfolio.videoPreview" :src="editingPortfolio.videoPreview" controls style="max-width: 100%; max-height: 200px; margin-top: 15px; border-radius: 10px;"></video>
+                </div>
+                <div class="form-actions">
+                    <button class="btn btn-secondary" @click="closeModals">取消</button>
+                    <button class="btn btn-primary" @click="savePortfolio">保存</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="image-viewer" v-if="showImageViewer" @click="closeImageViewer">
+            <div class="image-viewer-content" @click.stop>
+                <img :src="viewerImage" alt="查看图片">
+                <button class="image-viewer-close" @click="closeImageViewer">×</button>
+            </div>
+        </div>
+
+        <div class="toast" v-if="toast.show">
+            {{ toast.message }}
+        </div>
+    </div>
+
+    <script>
+        const { createApp, ref, computed, onMounted } = Vue;
+
+        createApp({
+            setup() {
+                const editMode = ref(false);
+                const showProfileModal = ref(false);
+                const showExperienceModal = ref(false);
+                const showPortfolioModal = ref(false);
+                const showImageViewer = ref(false);
+                const viewerImage = ref('');
+                const currentCategory = ref('all');
+                const toast = ref({ show: false, message: '' });
+
+                const profile = ref({
+                    name: '张三',
+                    title: '设计师 / 开发者',
+                    bio: '热爱设计与编程，致力于创造美好的数字体验。拥有5年以上的行业经验，专注于用户体验设计和前端开发。',
+                    skills: ['Vue.js', 'React', 'UI设计', '前端开发', '用户体验'],
+                    image: null
+                });
+
+                const experiences = ref([
+                    {
+                        id: 1,
+                        company: 'ABC科技有限公司',
+                        position: '前端开发工程师',
+                        time: '2023.01 - 2023.06',
+                        content: '负责公司核心产品的前端开发工作，使用Vue3框架构建响应式用户界面，优化页面性能，提升用户体验。',
+                        image: null
+                    }
+                ]);
+
+                const portfolios = ref([
+                    {
+                        id: 1,
+                        category: '设计',
+                        title: '品牌视觉设计',
+                        description: '为某科技公司设计的完整品牌视觉系统，包括Logo、色彩方案、字体规范等。',
+                        images: [],
+                        video: null
+                    }
+                ]);
+
+                const editingProfile = ref({
+                    name: '',
+                    title: '',
+                    bio: '',
+                    skillsText: '',
+                    image: null,
+                    imagePreview: null
+                });
+
+                const editingExperience = ref({
+                    id: null,
+                    company: '',
+                    position: '',
+                    time: '',
+                    content: '',
+                    image: null,
+                    imagePreview: null
+                });
+
+                const editingPortfolio = ref({
+                    id: null,
+                    category: '',
+                    title: '',
+                    description: '',
+                    images: [],
+                    video: null,
+                    videoPreview: null
+                });
+
+                const categories = computed(() => {
+                    return [...new Set(portfolios.value.map(p => p.category).filter(Boolean))];
+                });
+
+                const filteredPortfolios = computed(() => {
+                    if (currentCategory.value === 'all') {
+                        return portfolios.value;
+                    }
+                    return portfolios.value.filter(p => p.category === currentCategory.value);
+                });
+
+                const toggleEditMode = () => {
+                    editMode.value = !editMode.value;
+                    if (!editMode.value) {
+                        saveAllData();
+                    }
+                };
+
+                const showToast = (message) => {
+                    toast.value = { show: true, message };
+                    setTimeout(() => {
+                        toast.value.show = false;
+                    }, 3000);
+                };
+
+                const openProfileModal = () => {
+                    editingProfile.value = {
+                        name: profile.value.name,
+                        title: profile.value.title,
+                        bio: profile.value.bio,
+                        skillsText: profile.value.skills.join(', '),
+                        image: profile.value.image,
+                        imagePreview: profile.value.image
+                    };
+                    showProfileModal.value = true;
+                };
+
+                const handleProfileImageUpload = (e) => {
+                    const file = e.target.files[0];
+                    if (file) {
+                        const reader = new FileReader();
+                        reader.onload = (event) => {
+                            editingProfile.value.imagePreview = event.target.result;
+                            editingProfile.value.image = event.target.result;
+                        };
+                        reader.readAsDataURL(file);
+                    }
+                };
+
+                const saveProfile = () => {
+                    profile.value = {
+                        ...profile.value,
+                        name: editingProfile.value.name,
+                        title: editingProfile.value.title,
+                        bio: editingProfile.value.bio,
+                        skills: editingProfile.value.skillsText.split(',').map(s => s.trim()).filter(Boolean),
+                        image: editingProfile.value.image
+                    };
+                    closeModals();
+                    showToast('个人信息已保存');
+                };
+
+                const openExperienceModal = () => {
+                    editingExperience.value = {
+                        id: null,
+                        company: '',
+                        position: '',
+                        time: '',
+                        content: '',
+                        image: null,
+                        imagePreview: null
+                    };
+                    showExperienceModal.value = true;
+                };
+
+                const editExperience = (id) => {
+                    const exp = experiences.value.find(e => e.id === id);
+                    if (exp) {
+                        editingExperience.value = {
+                            id: exp.id,
+                            company: exp.company,
+                            position: exp.position,
+                            time: exp.time,
+                            content: exp.content,
+                            image: exp.image,
+                            imagePreview: exp.image
+                        };
+                        showExperienceModal.value = true;
+                    }
+                };
+
+                const handleExperienceImageUpload = (e) => {
+                    const file = e.target.files[0];
+                    if (file) {
+                        const reader = new FileReader();
+                        reader.onload = (event) => {
+                            editingExperience.value.imagePreview = event.target.result;
+                            editingExperience.value.image = event.target.result;
+                        };
+                        reader.readAsDataURL(file);
+                    }
+                };
+
+                const saveExperience = () => {
+                    if (editingExperience.value.id) {
+                        const index = experiences.value.findIndex(e => e.id === editingExperience.value.id);
+                        if (index !== -1) {
+                            experiences.value[index] = {
+                                ...experiences.value[index],
+                                company: editingExperience.value.company,
+                                position: editingExperience.value.position,
+                                time: editingExperience.value.time,
+                                content: editingExperience.value.content,
+                                image: editingExperience.value.image
+                            };
+                        }
+                    } else {
+                        experiences.value.push({
+                            id: Date.now(),
+                            company: editingExperience.value.company,
+                            position: editingExperience.value.position,
+                            time: editingExperience.value.time,
+                            content: editingExperience.value.content,
+                            image: editingExperience.value.image
+                        });
+                    }
+                    closeModals();
+                    showToast('实习经历已保存');
+                };
+
+                const deleteExperience = (id) => {
+                    if (confirm('确定要删除这段实习经历吗？')) {
+                        experiences.value = experiences.value.filter(e => e.id !== id);
+                        showToast('实习经历已删除');
+                    }
+                };
+
+                const openPortfolioModal = () => {
+                    editingPortfolio.value = {
+                        id: null,
+                        category: '',
+                        title: '',
+                        description: '',
+                        images: [],
+                        video: null,
+                        videoPreview: null
+                    };
+                    showPortfolioModal.value = true;
+                };
+
+                const editPortfolio = (id) => {
+                    const item = portfolios.value.find(p => p.id === id);
+                    if (item) {
+                        editingPortfolio.value = {
+                            id: item.id,
+                            category: item.category,
+                            title: item.title,
+                            description: item.description,
+                            images: [...item.images],
+                            video: item.video,
+                            videoPreview: item.video
+                        };
+                        showPortfolioModal.value = true;
+                    }
+                };
+
+                const handlePortfolioImagesUpload = (e) => {
+                    const files = Array.from(e.target.files);
+                    files.forEach(file => {
+                        const reader = new FileReader();
+                        reader.onload = (event) => {
+                            editingPortfolio.value.images.push(event.target.result);
+                        };
+                        reader.readAsDataURL(file);
+                    });
+                };
+
+                const removePortfolioImage = (index) => {
+                    editingPortfolio.value.images.splice(index, 1);
+                };
+
+                const handlePortfolioVideoUpload = (e) => {
+                    const file = e.target.files[0];
+                    if (file) {
+                        const reader = new FileReader();
+                        reader.onload = (event) => {
+                            editingPortfolio.value.videoPreview = event.target.result;
+                            editingPortfolio.value.video = event.target.result;
+                        };
+                        reader.readAsDataURL(file);
+                    }
+                };
+
+                const savePortfolio = () => {
+                    if (editingPortfolio.value.id) {
+                        const index = portfolios.value.findIndex(p => p.id === editingPortfolio.value.id);
+                        if (index !== -1) {
+                            portfolios.value[index] = {
+                                ...portfolios.value[index],
+                                category: editingPortfolio.value.category,
+                                title: editingPortfolio.value.title,
+                                description: editingPortfolio.value.description,
+                                images: editingPortfolio.value.images,
+                                video: editingPortfolio.value.video
+                            };
+                        }
+                    } else {
+                        portfolios.value.push({
+                            id: Date.now(),
+                            category: editingPortfolio.value.category,
+                            title: editingPortfolio.value.title,
+                            description: editingPortfolio.value.description,
+                            images: editingPortfolio.value.images,
+                            video: editingPortfolio.value.video
+                        });
+                    }
+                    closeModals();
+                    showToast('作品已保存');
+                };
+
+                const deletePortfolio = (id) => {
+                    if (confirm('确定要删除这个作品吗？')) {
+                        portfolios.value = portfolios.value.filter(p => p.id !== id);
+                        showToast('作品已删除');
+                    }
+                };
+
+                const openImageViewer = (images) => {
+                    if (Array.isArray(images) && images.length > 0) {
+                        viewerImage.value = images[0];
+                        showImageViewer.value = true;
+                    }
+                };
+
+                const closeImageViewer = () => {
+                    showImageViewer.value = false;
+                };
+
+                const closeModals = () => {
+                    showProfileModal.value = false;
+                    showExperienceModal.value = false;
+                    showPortfolioModal.value = false;
+                };
+
+                const execCommand = (command) => {
+                    document.execCommand(command, false, null);
+                };
+
+                const saveAllData = () => {
+                    localStorage.setItem('portfolioData', JSON.stringify({
+                        profile: profile.value,
+                        experiences: experiences.value,
+                        portfolios: portfolios.value
+                    }));
+                    showToast('所有数据已保存');
+                };
+
+                const loadData = () => {
+                    const saved = localStorage.getItem('portfolioData');
+                    if (saved) {
+                        const data = JSON.parse(saved);
+                        profile.value = data.profile || profile.value;
+                        experiences.value = data.experiences || experiences.value;
+                        portfolios.value = data.portfolios || portfolios.value;
+                    }
+                };
+
+                onMounted(() => {
+                    loadData();
+                });
+
+                return {
+                    editMode,
+                    showProfileModal,
+                    showExperienceModal,
+                    showPortfolioModal,
+                    showImageViewer,
+                    viewerImage,
+                    currentCategory,
+                    toast,
+                    profile,
+                    experiences,
+                    portfolios,
+                    editingProfile,
+                    editingExperience,
+                    editingPortfolio,
+                    categories,
+                    filteredPortfolios,
+                    toggleEditMode,
+                    openProfileModal,
+                    handleProfileImageUpload,
+                    saveProfile,
+                    openExperienceModal,
+                    editExperience,
+                    handleExperienceImageUpload,
+                    saveExperience,
+                    deleteExperience,
+                    openPortfolioModal,
+                    editPortfolio,
+                    handlePortfolioImagesUpload,
+                    removePortfolioImage,
+                    handlePortfolioVideoUpload,
+                    savePortfolio,
+                    deletePortfolio,
+                    openImageViewer,
+                    closeImageViewer,
+                    closeModals,
+                    execCommand
+                };
+            }
+        }).mount('#app');
+    </script>
+</body>
+</html>
